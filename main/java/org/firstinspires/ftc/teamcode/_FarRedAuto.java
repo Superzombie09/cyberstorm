@@ -287,53 +287,34 @@ public class _FarRedAuto extends LinearOpMode {
         BackLeft.setDirection(DcMotor.Direction.REVERSE);
         FrontRight.setDirection(DcMotor.Direction.FORWARD);
         BackRight.setDirection(DcMotor.Direction.FORWARD);
-        // makes the color sensor the back
+
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         waitForStart();
 
-        //Move(-0.225, -0.2, -0.225, -0.2, 3250); // moves robot to pixel
         BetterMove(0.4, 30,30,30,30,false);
         // moves robot to check if thing is there
         colorCheck();
         if (colorNumber == 1 || colorNumber == 2) {
-//            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
-//            BackLeft.setDirection(DcMotor.Direction.FORWARD);
-//            FrontRight.setDirection(DcMotor.Direction.REVERSE);
-//            BackRight.setDirection(DcMotor.Direction.REVERSE);
             Reverse();
             Move(0.15,0.125,0.15,0.125,500);
 
         }
         PlacePixel();
         if (dropPixel == 1 && park == 1) { // if thing is there
-//            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
-//            BackLeft.setDirection(DcMotor.Direction.FORWARD);
-//            FrontRight.setDirection(DcMotor.Direction.REVERSE);
-//            BackRight.setDirection(DcMotor.Direction.REVERSE);
             Reverse();
             Move(0.5,-0.5,-0.3,0.3, 300);
             BetterMove(0.5,27,27,27,27, false);
-//            FrontLeft.setDirection(DcMotor.Direction.FORWARD);
-//            BackLeft.setDirection(DcMotor.Direction.REVERSE);
-//            FrontRight.setDirection(DcMotor.Direction.FORWARD);
-//            BackRight.setDirection(DcMotor.Direction.FORWARD);
             Forward();
             BetterMove(0.15,3,3,3,3,false);
-//            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
-//            BackLeft.setDirection(DcMotor.Direction.FORWARD);
-//            FrontRight.setDirection(DcMotor.Direction.REVERSE);
-//            BackRight.setDirection(DcMotor.Direction.REVERSE);
             Reverse();
             BetterMove(0.4, 20.5, 20.5,20.5, 20.5, true);
-            BetterMove(1,45,45,45,45, false);
+            BetterMove(0.8,45,45,45,45, false);
             BetterMove(0.4,20.5,20.5,20.5,20.5,true);
-            BetterMove(1,50,50,50,50,false);
-//            FrontLeft.setDirection(DcMotor.Direction.FORWARD);
-//            BackLeft.setDirection(DcMotor.Direction.REVERSE);
-//            FrontRight.setDirection(DcMotor.Direction.FORWARD);
-//            BackRight.setDirection(DcMotor.Direction.FORWARD);
+            BetterMove(0.8,50,50,50,50,false);
             Forward();
             BetterMove(0.4,20.5,20.5,20.5,20.5,true);
-            BetterMove(1,25,25,25,25, false);
+            BetterMove(0.8,25,25,25,25, false);
 //            BetterMove(0.5, )
 //            BetterMove(0.4,62,62,62,62,true);
 //            BetterMove(0.3,30,30,30,30,false);
@@ -343,34 +324,21 @@ public class _FarRedAuto extends LinearOpMode {
 //            BetterMove(0.3,60,60,60,60,false);
 
         } else { // if thing isn't there
-//            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
-//            BackLeft.setDirection(DcMotor.Direction.FORWARD);
-//            FrontRight.setDirection(DcMotor.Direction.REVERSE);
-//            BackRight.setDirection(DcMotor.Direction.REVERSE);
             Reverse();
-            // makes the color sensor front of robot
             BetterMove(0.4,12,12,12,12 ,false);
             // goes backwards
-            Move(0.5,-0.5,-0.3,0.3,1400);
-            // strafes right (from robot pov)
-//            FrontLeft.setDirection(DcMotor.Direction.FORWARD);
-//            BackLeft.setDirection(DcMotor.Direction.REVERSE);
-//            FrontRight.setDirection(DcMotor.Direction.FORWARD);
-//            BackRight.setDirection(DcMotor.Direction.FORWARD);
+            Move(0.5,-0.5,-0.3,0.3,1300);
+            // strafes
             Forward();
             BetterMove(0.3,8,8,8,8,false);
             // moves backwards
             colorCheck();
             if (colorNumber == 1 || colorNumber == 2) {
                 Move(-0.3,-0.3,-0.3,-0.3,500);
-//                Move(0.5,-0.5,-0.3,0.3, 500);
+                Move(0.5,-0.5,-0.3,0.3, 400);
             }
             PlacePixel();
             sleep(2000);
-//            FrontLeft.setDirection(DcMotor.Direction.FORWARD);
-//            BackLeft.setDirection(DcMotor.Direction.REVERSE);
-//            FrontRight.setDirection(DcMotor.Direction.FORWARD);
-//            BackRight.setDirection(DcMotor.Direction.FORWARD);
             Forward();
             if (dropPixel == 1 && park == 2) { // parks
 //                Move(0.3,-0.3,-0.3,0.3,250);
@@ -380,15 +348,10 @@ public class _FarRedAuto extends LinearOpMode {
 //                BetterMove(0.4, 18, 18, 18, 18, true);
 //                BetterMove(0.4, 60, 60, 60, 60, false);
             } else { // drops pixel far left
-                BetterMove(0.4, 3,3,3,3,false);
                 BetterMove(0.4, 20, 20, 20, 20, true);
                 BetterMove(0.4,12,12,12,12,false);
                 pixelServo.setPosition(1);
                 sleep(500);
-//                FrontLeft.setDirection(DcMotor.Direction.FORWARD);
-//                BackLeft.setDirection(DcMotor.Direction.REVERSE);
-//                FrontRight.setDirection(DcMotor.Direction.FORWARD);
-//                BackRight.setDirection(DcMotor.Direction.FORWARD);
                 Forward();
 /*                BetterMove(0.3, 30, 30, 30, 30, false);
                 BetterMove(0.3, 48, 48, 48, 48, true);
