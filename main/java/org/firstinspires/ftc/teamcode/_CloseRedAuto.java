@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -45,6 +46,7 @@ public class _CloseRedAuto extends LinearOpMode {
     private DcMotor FrontRight = null;
     private DcMotor BackLeft = null;
     private DcMotor BackRight = null;
+    private Servo pixelServo = null;
     static final double COUNTS_PER_MOTOR_REV = ((((1 + (46f / 17f))) * (1 + (46f / 17f))) * 28);    // eg: 5203 Yellow Jacket Planetary 435 RPM
     static final double DRIVE_GEAR_REDUCTION = 1;     // No External Gearing.
     static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
@@ -53,25 +55,313 @@ public class _CloseRedAuto extends LinearOpMode {
     static final double DRIVE_SPEED = 0.3;
     static final double TURN_SPEED = 0.5;
     private int colorNumber = 0;
+    private int dropPixel = 0;
+    private int park = 0;
 
+    public void colorCheck() {
+        if (opModeIsActive()) {
+            for (int i = 0; i < 120; i++) {
+                telemetry.addData("Red", Color_Sensor.red());
+                telemetry.addData("Green", Color_Sensor.green());
+                telemetry.addData("Blue", Color_Sensor.blue());
 
+                if (Color_Sensor.red() > 200) {
+                    telemetry.addData("Color", "TrueRed");
+                    colorNumber = 1; // 1 -> red
+                }
+                if (Color_Sensor.blue() > 200) {
+                    telemetry.addData("Color", "TrueBlue");
+                    colorNumber = 2; // 2 -> blue
+                }
+                telemetry.update();
+            }
+        }
+    }
+    public void Forward() {
+        FrontLeft.setDirection(DcMotor.Direction.FORWARD);
+        BackLeft.setDirection(DcMotor.Direction.REVERSE);
+        FrontRight.setDirection(DcMotor.Direction.FORWARD);
+        BackRight.setDirection(DcMotor.Direction.FORWARD);
+    }
+    public void Reverse() {
+        FrontLeft.setDirection(DcMotor.Direction.REVERSE);
+        BackLeft.setDirection(DcMotor.Direction.FORWARD);
+        FrontRight.setDirection(DcMotor.Direction.REVERSE);
+        BackRight.setDirection(DcMotor.Direction.REVERSE);
+    }
+    public void Move(double fl,
+                     double fr,
+                     double bl,
+                     double br,
+                     int time) {
+        if (opModeIsActive()) {
+        FrontLeft.setPower(fl/2);
+        BackLeft.setPower(bl);
+        FrontRight.setPower(fr/2);
+        BackRight.setPower(br);
+
+        sleep(time);
+
+        FrontLeft.setPower(0);
+        BackLeft.setPower(0);
+        FrontRight.setPower(0);
+        BackRight.setPower(0);
+    }}
+    public void PlacePixel() {
+        if (opModeIsActive()) {
+        if (colorNumber == 1 || colorNumber == 2) {
+            telemetry.addData("drop pixel", "true");
+            dropPixel = 1;
+            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
+            BackLeft.setDirection(DcMotor.Direction.FORWARD);
+            FrontRight.setDirection(DcMotor.Direction.REVERSE);
+            BackRight.setDirection(DcMotor.Direction.REVERSE);
+            pixelServo.setPosition(1);
+        }
+        park += 1;
+    }}
+    public void BetterMove(double speed,
+                                 double leftFrontInches,
+                                 double leftBackInches,
+                                 double rightFrontInches,
+                                 double rightBackInches,
+                                 Boolean Turn) {
+//        int LeftFrontTarget = 0;
+//        int LeftBackTarget = 0;
+        int RightFrontTarget = 0;
+        int RightBackTarget = 0;
+
+        //leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            //LeftFrontTarget = (int) (leftFrontInches * COUNTS_PER_INCH);
+            //LeftBackTarget = (int) (leftBackInches * COUNTS_PER_INCH) * 2;
+            RightFrontTarget = (int) (rightFrontInches * COUNTS_PER_INCH);
+            RightBackTarget = (int) (rightBackInches * COUNTS_PER_INCH) * 2;
+
+            //leftFrontDrive.setTargetPosition(LeftFrontTarget);
+            //leftBackDrive.setTargetPosition(LeftBackTarget);
+            FrontRight.setTargetPosition(RightFrontTarget);
+            BackRight.setTargetPosition(RightBackTarget);
+
+            //leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //telemetry.addData( "Target Position", leftFrontDrive.getTargetPosition());
+            //telemetry.addData( "Target Position", leftBackDrive.getTargetPosition());
+            telemetry.addData("Target Position", FrontRight.getTargetPosition());
+            telemetry.addData("Target Position", BackRight.getTargetPosition());
+            telemetry.update();
+            sleep(500);
+
+            //start motion.
+            /*if (leftFrontDrive.getTargetPosition() !=  0) {
+                if (LeftFrontTarget < 0) {
+                    leftFrontDrive.setPower(-speed);
+                } else {
+                    leftFrontDrive.setPower(speed);
+                }
+            }
+            if (leftBackDrive.getTargetPosition() != 0) {
+                if (LeftBackTarget < 0) {
+                    leftBackDrive.setPower(-speed);
+                } else {
+                    leftBackDrive.setPower(speed);
+                }
+            }
+            if (rightFrontDrive.getTargetPosition() != 0) {
+                if (RightFrontTarget < 0) {
+                    rightFrontDrive.setPower(-speed);
+                } else {
+                    rightFrontDrive.setPower(speed);
+                }
+            }
+            if (rightBackDrive.getTargetPosition() != 0) {
+                if (RightBackTarget < 0) {
+                    rightBackDrive.setPower(-speed);
+                } else {
+                    rightBackDrive.setPower(speed);
+                }
+
+            }
+            */
+
+            if (Turn) {
+
+                if (FrontRight.getTargetPosition() != 0) {
+                    FrontRight.setPower(speed/2);
+                }
+
+                if (BackRight.getTargetPosition() != 0) {
+                    BackRight.setPower(speed);
+                }
+
+                if (leftFrontInches != 0 || leftBackInches != 0) {
+                    while (FrontRight.getCurrentPosition() < FrontRight.getTargetPosition()
+                            || BackRight.getCurrentPosition() < BackRight.getTargetPosition()) {
+                        FrontLeft.setPower(1 * (-speed/2));
+                        BackLeft.setPower(0.875 * -speed);
+                    }
+                    FrontLeft.setPower(0);
+                    BackLeft.setPower(0);
+                }
+
+            } else {
+
+                if (FrontRight.getTargetPosition() != 0) {
+                    FrontRight.setPower(speed/2);
+                }
+
+                if (BackRight.getTargetPosition() != 0) {
+                    BackRight.setPower(speed);
+                }
+
+                if (leftFrontInches != 0 || leftBackInches != 0) {
+                    while (FrontRight.getCurrentPosition() < FrontRight.getTargetPosition()
+                            || BackRight.getCurrentPosition() < BackRight.getTargetPosition()) {
+                        FrontLeft.setPower(0.9 * (speed/2));
+                        BackLeft.setPower(0.9 * speed);
+                    }
+                    FrontLeft.setPower(0);
+                    BackLeft.setPower(0);
+                }
+            }
+            while (FrontRight.isBusy()) {
+                telemetry.update();
+                //            while (leftFrontDrive.isBusy() || leftBackDrive.isBusy() || rightFrontDrive.isBusy() || rightBackDrive.isBusy()) {
+            }
+//                // Display it for the driver.
+//            //telemetry.addData("Running to",  " %7d :%7d", newLeftFrontTarget,  newLeftBackTarget,   newRightFrontTarget,   newRightBackTarget);
+//            telemetry.addData("Currently at", " at %7d :%7d :%7d :%7d",
+            //                   rightFrontDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
+//            telemetry.update();
+//            }
+
+            // Stop all motion;
+            FrontLeft.setPower(0);
+            FrontRight.setPower(0);
+            BackLeft.setPower(0);
+            BackRight.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            //leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(500);   // optional pause after each move.
+        }
+    }
     @Override
     public void runOpMode() {
-
-        waitForStart();
 
         Color_Sensor = hardwareMap.get(ColorSensor.class, "Color Sensor");
         FrontLeft = hardwareMap.get(DcMotor.class, "front_left");
         FrontRight = hardwareMap.get(DcMotor.class, "front_right");
         BackLeft = hardwareMap.get(DcMotor.class, "back_left");
         BackRight = hardwareMap.get(DcMotor.class, "back_right");
+        pixelServo = hardwareMap.get(Servo.class, "servo_pixel"); // don't forget to import servo
 
-        FrontLeft.setDirection(DcMotor.Direction.REVERSE);
-        BackLeft.setDirection(DcMotor.Direction.FORWARD);
-        FrontRight.setDirection(DcMotor.Direction.REVERSE);
-        BackRight.setDirection(DcMotor.Direction.REVERSE);
+        pixelServo.setDirection(Servo.Direction.FORWARD);
 
-        Move(-0.225, -0.2, -0.225, -0.2, 3250); // moves robot to pixel
+        pixelServo.scaleRange(0, 0.7);
+
+        Forward();
+
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // makes the color sensor the back
+        waitForStart();
+
+        //Move(-0.225, -0.2, -0.225, -0.2, 3250); // moves robot to pixel
+        BetterMove(0.4, 30,30,30,30,false);
+        // moves robot to check if thing is there
+        colorCheck();
+        if (colorNumber == 1 || colorNumber == 2) {
+            Reverse();
+            Move(0.15,0.125,0.15,0.125,700);
+
+        }
+        PlacePixel();
+        if (dropPixel == 1 && park == 1) { // if thing is there
+            sleep(1000);
+/*            FrontLeft.setDirection(DcMotor.Direction.REVERSE);
+            BackLeft.setDirection(DcMotor.Direction.FORWARD);
+            FrontRight.setDirection(DcMotor.Direction.REVERSE);
+            BackRight.setDirection(DcMotor.Direction.REVERSE);
+            BetterMove(0.5,23,23,23,23, false);
+            BetterMove(0.7, 60, 60,60, 60, true);
+            BetterMove(0.8,50,50,50,50, false);
+            Move(0.36, -0.3, -0.36, 0.3, 900);
+            BetterMove(0.4,25,25,25,25, false);
+            */
+//            BetterMove(0.5, )
+//            BetterMove(0.4,62,62,62,62,true);
+//            BetterMove(0.3,30,30,30,30,false);
+//            BetterMove(0.3,48,48,48,48,true);
+//            BetterMove(0.3,30,30,30,30,false);
+//            BetterMove(0.3,18,18,18,18,true);
+//            BetterMove(0.3,60,60,60,60,false);
+
+        } else { // if thing isn't there
+            Reverse();
+            // makes the color sensor front of robot
+            BetterMove(0.4,12,12,12,12 ,false);
+            // goes backwards
+            Move(-0.5,0.5,0.3,-0.3,1200);
+            // strafes right (from robot pov)
+            Forward();
+            BetterMove(0.3,8,8,8,8,false);
+            // moves backwards
+            colorCheck();
+            if (colorNumber == 1 || colorNumber == 2) {
+                Move(-0.3,-0.3,-0.3,-0.3,300);
+                Move(0.5,-0.5,-0.3,0.3, 400);
+            }
+            PlacePixel();
+            Forward();
+            if (dropPixel == 1 && park == 2) { // parks
+                sleep(1000);
+//                Move(0.3,-0.3,-0.3,0.3,250);
+//                BetterMove(0.4, 30, 30, 30, 30, false);
+//                BetterMove(0.4, 48, 48, 48, 48, true);
+//                BetterMove(0.4, 30, 30, 30, 30, false);
+//                BetterMove(0.4, 18, 18, 18, 18, true);
+//                BetterMove(0.4, 60, 60, 60, 60, false);
+            } else { // drops pixel far left
+                BetterMove(0.4, 3,3,3,3,false);
+                BetterMove(0.4, 67, 67, 67, 67, true);
+                BetterMove(0.4,15,15,15,15,false);
+                pixelServo.setPosition(1);
+                Forward();
+                sleep(1000);
+/*                BetterMove(0.3, 30, 30, 30, 30, false);
+                BetterMove(0.3, 48, 48, 48, 48, true);
+                BetterMove(0.3, 30, 30, 30, 30, false);
+                BetterMove(0.3, 18, 18, 18, 18, true);
+                BetterMove(0.3, 60, 60, 60, 60, false);
+*/
+            }
+        }
+
+
+
+
 
 //        FrontLeft.setPower(-0.225);
 //        BackLeft.setPower(-0.225);
@@ -85,27 +375,58 @@ public class _CloseRedAuto extends LinearOpMode {
 //        FrontRight.setPower(0);
 //        BackRight.setPower(0);
 
-        Color_Sensor.enableLed(true);
+/*        Color_Sensor.enableLed(true);
 
-        for (int i = 0; i < 400; i++){
+        colorCheck();
+
+
+        for (int i = 0; i < 100; i++) {
             telemetry.addData("Red", Color_Sensor.red());
             telemetry.addData("Green", Color_Sensor.green());
             telemetry.addData("Blue", Color_Sensor.blue());
 
             if (Color_Sensor.red() > Color_Sensor.blue() && Color_Sensor.red() > Color_Sensor.green()) {
                 telemetry.addData("Color", "TrueRed");
-                colorNumber = 1; // 1 -> red
+               colorNumber = 1; // 1 -> red
             }
 
             if (Color_Sensor.blue() > Color_Sensor.red() && Color_Sensor.blue() > Color_Sensor.green()) {
                 telemetry.addData("Color", "TrueBlue");
                 colorNumber = 2; // 2 -> blue
-            }
 
             telemetry.update();
+            }
+        }
 
-            Color_Sensor.enableLed(false);
 
+        Color_Sensor.enableLed(false);
+
+        if (colorNumber == 2) {
+            telemetry.addData("drop pixel", "true");
+            dropPixel = 1;
+            pixelServo.setPosition(1);
+            park = 1;
+        } else {
+            ;
+            Move(0.325, -0.3, 0.325, -0.3, 2000);
+            Color_Sensor.enableLed(true);
+            if (Color_Sensor.blue() > Color_Sensor.red() && Color_Sensor.blue() > Color_Sensor.green()) {
+                telemetry.addData("Color", "TrueBlue");
+                colorNumber = 2; // 2 -> blue
+                if (colorNumber == 2) {
+                    dropPixel = 1;
+                    pixelServo.setPosition(0.5);
+                    park = 2;
+                } else {
+                    Move(0.325, -0.3, 0.325, -0.3, 4000);
+                    dropPixel = 1;
+                    pixelServo.setPosition(0.5);
+                    park = 3;
+                }
+            }
+        }
+
+*/
             // Red marker Red avg range: 15-30
             // Red marker Blue avg range: 0-10
             // Red marker Green avg range: 5-15
@@ -113,26 +434,5 @@ public class _CloseRedAuto extends LinearOpMode {
             // Blue marker Blue avg range: 15-30
             // Blue marker Green avg range: 5-15
 
-        }
     }
-
-    public void Move(double fl,
-                     double fr,
-                     double bl,
-                     double br,
-                     int time) {
-
-        FrontLeft.setPower(fl);
-        BackLeft.setPower(bl);
-        FrontRight.setPower(fr);
-        BackRight.setPower(br);
-
-        sleep(time);
-
-        FrontLeft.setPower(0);
-        BackLeft.setPower(0);
-        FrontRight.setPower(0);
-        BackRight.setPower(0);
-    }
-
 }

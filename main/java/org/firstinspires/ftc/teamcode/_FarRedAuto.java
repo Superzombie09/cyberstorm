@@ -66,11 +66,11 @@ public class _FarRedAuto extends LinearOpMode {
                 telemetry.addData("Green", Color_Sensor.green());
                 telemetry.addData("Blue", Color_Sensor.blue());
 
-                if (Color_Sensor.red() > 400) {
+                if (Color_Sensor.red() > 200) {
                     telemetry.addData("Color", "TrueRed");
                     colorNumber = 1; // 1 -> red
                 }
-                if (Color_Sensor.blue() > 400) {
+                if (Color_Sensor.blue() > 200) {
                     telemetry.addData("Color", "TrueBlue");
                     colorNumber = 2; // 2 -> blue
                 }
@@ -222,8 +222,8 @@ public class _FarRedAuto extends LinearOpMode {
                 if (leftFrontInches != 0 || leftBackInches != 0) {
                     while (FrontRight.getCurrentPosition() < FrontRight.getTargetPosition()
                             || BackRight.getCurrentPosition() < BackRight.getTargetPosition()) {
-                        FrontLeft.setPower(1 * (speed/2));
-                        BackLeft.setPower(0.875 * speed);
+                        FrontLeft.setPower(0.9 * (speed/2));
+                        BackLeft.setPower(0.9 * speed);
                     }
                     FrontLeft.setPower(0);
                     BackLeft.setPower(0);
@@ -297,12 +297,13 @@ public class _FarRedAuto extends LinearOpMode {
         colorCheck();
         if (colorNumber == 1 || colorNumber == 2) {
             Reverse();
-            Move(0.15,0.125,0.15,0.125,500);
+            Move(0.15,0.125,0.15,0.125,300);
 
         }
         PlacePixel();
-        if (dropPixel == 1 && park == 1) { // if thing is there
-            Reverse();
+        if (dropPixel == 1 && park == 1) {
+            sleep(1000);// if thing is there
+/*            Reverse();
             Move(0.5,-0.5,-0.3,0.3, 300);
             BetterMove(0.5,27,27,27,27, false);
             Forward();
@@ -315,7 +316,7 @@ public class _FarRedAuto extends LinearOpMode {
             Forward();
             BetterMove(0.4,20.5,20.5,20.5,20.5,true);
             BetterMove(0.8,25,25,25,25, false);
-//            BetterMove(0.5, )
+*///            BetterMove(0.5, )
 //            BetterMove(0.4,62,62,62,62,true);
 //            BetterMove(0.3,30,30,30,30,false);
 //            BetterMove(0.3,48,48,48,48,true);
@@ -335,12 +336,13 @@ public class _FarRedAuto extends LinearOpMode {
             colorCheck();
             if (colorNumber == 1 || colorNumber == 2) {
                 Move(-0.3,-0.3,-0.3,-0.3,500);
-                Move(0.5,-0.5,-0.3,0.3, 400);
+                Move(0.5,-0.5,-0.3,0.3, 300);
             }
             PlacePixel();
             sleep(2000);
             Forward();
             if (dropPixel == 1 && park == 2) { // parks
+                sleep(1000);
 //                Move(0.3,-0.3,-0.3,0.3,250);
 //                BetterMove(0.4, 30, 30, 30, 30, false);
 //                BetterMove(0.4, 48, 48, 48, 48, true);
@@ -349,7 +351,7 @@ public class _FarRedAuto extends LinearOpMode {
 //                BetterMove(0.4, 60, 60, 60, 60, false);
             } else { // drops pixel far left
                 BetterMove(0.4, 20, 20, 20, 20, true);
-                BetterMove(0.4,12,12,12,12,false);
+                BetterMove(0.4,10,10,10,10,false);
                 pixelServo.setPosition(1);
                 sleep(500);
                 Forward();

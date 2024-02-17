@@ -209,9 +209,10 @@ public class TeloOp2Player extends LinearOpMode {
                 //arm_rotationright.setPower(0.3);
             } else if (gamepad2.a) {
                 AButtonWasPressed = true;
-                arm_rotationright.setTargetPosition(-20);
+                arm_rotationright.setTargetPosition(-10);
                 arm_rotationright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm_rotationright.setPower(0.3);
+                sleep(250);
                 //arm_rotationright.setPower(-0.25);
             } else if (gamepad2.b) {
                 arm_rotationright.setTargetPosition(1000);
@@ -228,11 +229,26 @@ public class TeloOp2Player extends LinearOpMode {
             if (gamepad2.dpad_down) {
                 airplane.setPosition(1);
             }
+            if (gamepad2.dpad_right) {
+                arm_rotationright.setTargetPosition(-10);
+                arm_rotationright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm_rotationright.setPower(0.5);
+                sleep(250);
+                arm_rotationright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm_rotationright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (gamepad2.dpad_left) {
+                arm_rotationright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm_rotationright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                arm_rotationright.setTargetPosition(10);
+                arm_rotationright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm_rotationright.setPower(0.5);
+            }
             if (AButtonWasPressed) {
                 if (!arm_rotationright.isBusy()) {
                     arm_rotationright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     arm_rotationright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    arm_rotationright.setTargetPosition(10);
+                    arm_rotationright.setTargetPosition(15);
                     arm_rotationright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     arm_rotationright.setPower(0.5);
                     AButtonWasPressed = false;
