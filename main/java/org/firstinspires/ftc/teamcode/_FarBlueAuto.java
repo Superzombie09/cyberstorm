@@ -334,6 +334,7 @@ public class _FarBlueAuto extends LinearOpMode {
             if (colorNumber == 1 || colorNumber == 2) {
                 Move(-0.3,-0.3,-0.3,-0.3,300);
                 Move(0.5,-0.5,-0.3,0.3, 400);
+                //
             }
             PlacePixel();
             Forward();

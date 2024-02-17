@@ -355,7 +355,7 @@ public class _CloseRedAuto extends LinearOpMode {
                 BetterMove(0.3, 30, 30, 30, 30, false);
                 BetterMove(0.3, 18, 18, 18, 18, true);
                 BetterMove(0.3, 60, 60, 60, 60, false);
-*/
+*///
             }
         }
 

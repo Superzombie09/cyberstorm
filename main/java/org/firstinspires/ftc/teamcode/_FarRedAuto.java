@@ -156,7 +156,7 @@ public class _FarRedAuto extends LinearOpMode {
             telemetry.addData("Target Position", BackRight.getTargetPosition());
             telemetry.update();
             sleep(500);
-
+//
             //start motion.
             /*if (leftFrontDrive.getTargetPosition() !=  0) {
                 if (LeftFrontTarget < 0) {
